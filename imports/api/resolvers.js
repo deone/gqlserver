@@ -26,7 +26,7 @@ const resolvers = {
     },
     initiate() {
       return [
-        'Welcome to Neo\n\n1. Check In Vehicle\n2. Check Out Vehicle\n3. View Checked-in Vehicles\n4. View Account',
+        'Welcome Fellows! This is the Kitchen App Challenge\n\n1. Join a team\n2. Vote for a team',
         'Response',
         'xxx'
       ]

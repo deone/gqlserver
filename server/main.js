@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor'
-import { ApolloServer, gql } from 'apollo-server-express'
+import { ApolloServer } from 'apollo-server-express'
 import { WebApp } from 'meteor/webapp'
 import { getUser } from 'meteor/apollo'
 import casual from 'casual'
@@ -11,6 +11,25 @@ import typeDefs from '../imports/api/schema'
 import resolvers from '../imports/api/resolvers'
 
 import { Views } from '../imports/api/tasks'
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: async ({ req }) => ({
+    user: await getUser(req.headers.authorization)
+  })
+})
+
+server.applyMiddleware({
+  app: WebApp.connectHandlers,
+  path: '/graphql'
+})
+
+WebApp.connectHandlers.use('/graphql', (req, res) => {
+  if (req.method === 'GET') {
+    res.end()
+  }
+})
 
 Meteor.startup(() => {
   // create mock data with a seed, so we always get the same
@@ -35,34 +54,4 @@ Meteor.startup(() => {
       })
     })
   })
-})
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  /* playground: {
-    settings: {
-      'editor.theme': 'light',
-    },
-    tabs: [
-      {
-        endpoint,
-        query: defaultQuery,
-      },
-    ],
-  }, */
-  context: async ({ req }) => ({
-    user: await getUser(req.headers.authorization)
-  })
-})
-
-server.applyMiddleware({
-  app: WebApp.connectHandlers,
-  path: '/graphql'
-})
-
-WebApp.connectHandlers.use('/graphql', (req, res) => {
-  if (req.method === 'GET') {
-    res.end()
-  }
 })
